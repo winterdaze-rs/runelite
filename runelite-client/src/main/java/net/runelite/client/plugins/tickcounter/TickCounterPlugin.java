@@ -9,11 +9,9 @@ import javax.inject.Inject;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 import net.runelite.api.events.AnimationChanged;
-import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.kit.KitType;
 import net.runelite.client.config.ConfigManager;
@@ -45,7 +43,7 @@ public class TickCounterPlugin extends Plugin {
 
 	Map<String, Integer> activity = new HashMap<>();
 
-	private List<Player> blowpiping = new ArrayList<>();
+	private HashMap<Player, Boolean> blowpiping = new HashMap<>();
 	boolean instanced = false;
 	boolean prevInstance = false;
 
@@ -76,7 +74,7 @@ public class TickCounterPlugin extends Plugin {
 			case 5061: // blowpipe
 				if (weapon == 12926)
 				{
-					blowpiping.add(p);
+					blowpiping.put(p, Boolean.FALSE);
 				}
 				else
 				{
@@ -171,22 +169,18 @@ public class TickCounterPlugin extends Plugin {
 	}
 
 	@Subscribe
-	public void onClientTick(ClientTick e) {
-		/*
-		 * Hack for blowpipe since the AnimationChanged event doesn't fire when using a
-		 * blowpipe because of its speed. If blowpipe animation restarts, then add 2
-		 */
-		for (Player p : blowpiping) {
-			Actor rsp = p;
-			if (rsp.getActionFrame() == 0 && rsp.getActionFrameCycle() == 1) {
-				String name = p.getName();
+	public void onGameTick(GameTick tick){
+		for (Map.Entry<Player, Boolean> entry : blowpiping.entrySet()) {
+			if (entry.getValue()) {
+				String name = entry.getKey().getName();
 				int activity = this.activity.getOrDefault(name, 0).intValue();
 				this.activity.put(name, activity + 2);
+				blowpiping.put(entry.getKey(), Boolean.FALSE);
+			}
+			else {
+				blowpiping.put(entry.getKey(), Boolean.TRUE);
 			}
 		}
-	}
-	@Subscribe
-	public void onGameTick(GameTick tick){
 		if(!config.instance())return;
 		prevInstance = instanced;
 		instanced = client.isInInstancedRegion();
