@@ -475,6 +475,20 @@ public enum Varbits
 	VENGEANCE_COOLDOWN(2451),
 
 	/**
+	 * 0 = standard
+	 * 1 = ancients
+	 * 2 = lunars
+	 * 3 = arrceus
+	 **/
+	SPELLBOOK_ID(4070),
+
+	/**
+	 * 0 = no
+	 * 1 = yes
+	 **/
+	SPELLBOOK_HIDDEN(6718),
+
+	/**
 	 * Amount of items in each bank tab
 	 */
 	BANK_TAB_ONE_COUNT(4171),
@@ -500,14 +514,33 @@ public enum Varbits
 	QUEST_TAB(8168),
 
 	/**
-	 * Explorer ring
+	 * Varbits relating to bloat door
 	 */
+	BLOAT_DOOR(6447),
+
+	/**
+	 * Active spellbook (see enumID)
+	 */
+	SPELLBOOK(4070),
+
+	/**
+	 * Spellbook filtering (1 = unfiltered, 0 = filtered)
+	 */
+	FILTER_SPELLBOOK(6718),
+
+
 	EXPLORER_RING_ALCHTYPE(5398),
 	EXPLORER_RING_TELEPORTS(4552),
 	EXPLORER_RING_ALCHS(4554),
 	EXPLORER_RING_RUNENERGY(4553),
 
-	WINTERTODT_TIMER(7980);
+	WINTERTODT_TIMER(7980),
+
+	/**
+	 * Some varbit that triggers goingg through the door to boss in gauntlet
+	 */
+	GAUNTLET_BOSS_DOOR(9177),
+	GAUNTLET_ENTRY(9178);
 
 	/**
 	 * The raw varbit ID.

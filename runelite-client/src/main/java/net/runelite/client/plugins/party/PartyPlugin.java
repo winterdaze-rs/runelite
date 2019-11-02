@@ -48,10 +48,7 @@ import net.runelite.api.Skill;
 import net.runelite.api.SoundEffectID;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.CommandExecuted;
-import net.runelite.api.events.FocusChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.*;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -134,6 +131,8 @@ public class PartyPlugin extends Plugin implements KeyListener
 	private boolean hotkeyDown, doSync;
 	private boolean sendAlert;
 
+	@Getter
+	private Color color = Color.WHITE;
 	@Override
 	public void configure(Binder binder)
 	{
@@ -236,14 +235,23 @@ public class PartyPlugin extends Plugin implements KeyListener
 		}
 
 		event.consume();
-		final TilePing tilePing = new TilePing(selectedSceneTile.getWorldLocation());
+		final TilePing tilePing = new TilePing(selectedSceneTile.getWorldLocation(), false);
 		tilePing.setMemberId(party.getLocalMember().getMemberId());
 		wsClient.send(tilePing);
 	}
 
 	@Subscribe
+	public void onConfigChanged(ConfigChanged event){
+		this.color = config.pingColor();
+	}
+
+	@Subscribe
 	public void onTilePing(TilePing event)
 	{
+		if (event.isRetain())
+		{
+			return;
+		}
 		if (config.pings())
 		{
 			final PartyData partyData = getPartyData(event.getMemberId());
@@ -495,7 +503,8 @@ public class PartyPlugin extends Plugin implements KeyListener
 				worldMapManager.add(worldMapPoint);
 			}
 
-			return new PartyData(u, name, worldMapPoint, ColorUtil.fromObject(name));
+			return new PartyData(u, name, worldMapPoint, config.pingColor());
+			//return new PartyData(u, name, worldMapPoint, ColorUtil.fromObject(name));
 		});
 	}
 
